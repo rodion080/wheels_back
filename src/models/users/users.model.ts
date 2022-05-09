@@ -64,4 +64,6 @@ export class User extends Model<User, UserCreationAttribute> {
   @BelongsToMany(()=>Journey, () =>UserJourney )
   journeys: Journey[];
 
+
+
 }

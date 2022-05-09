@@ -2,25 +2,24 @@ import {
   Controller,
   Get,
   Post,
-  UploadedFile,
   Body,
   Param,
-  UseInterceptors, UseGuards, Patch
+  Request,
+  UseInterceptors, UseGuards, Patch, UnauthorizedException
 } from "@nestjs/common";
 import { UsersService } from './users.service';
 import { ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AvatarImageDto } from './dto/avatar-image.dto';
-import { AccountGuard } from "../../auth/account.guard";
-// import { User } from './users.model';
-// import { FilesService } from '../files/files.service';
-
+import { AccountGuard, getUserByRequest } from "../../auth/account.guard";
+import { AvatarImageDto2 } from "./dto/avatar-image.dto2";
+import {JwtService} from "@nestjs/jwt";
+import { IFile } from "../files/utils/file.util";
 @ApiTags('Users')
 @Controller('users')
 export class UsersController {
-  constructor(private usersService: UsersService) {}
+  constructor( private usersService: UsersService, private jwtService: JwtService) {}
 
   @Get()
   begin() {
@@ -43,21 +42,16 @@ export class UsersController {
     return this.usersService.login(loginUserDto);
   }
 
-  @Patch('/update')
-  @UseGuards(AccountGuard)
-  update(@Body() userDto: CreateUserDto) {
-    return this.usersService.update(userDto);
+  @Patch('/update2')
+  @UseInterceptors(FileInterceptor('image'))
+  update2(@Request() req) {
+    const user = getUserByRequest(req, this.jwtService);
+    if(user.id !== Number(req.body.userId)){
+      throw new UnauthorizedException({message: "User is not authorized"});
+    }
+    const userDto2 : AvatarImageDto2 =  req.body;
+    const image : IFile =  req.file;
+    return this.usersService.update2(userDto2, image);
   }
 
-  @Post('/avatarUpdate')
-  @UseInterceptors(FileInterceptor('image'))
-  async avatarUpdate(@Body() dto: AvatarImageDto, @UploadedFile() image) {
-    return this.usersService.avatarUpdate(dto, image);
-  }
-
-  @Post('/avatarUpload')
-  @UseInterceptors(FileInterceptor('image'))
-  async avatarUpload(@Body() dto: AvatarImageDto, @UploadedFile() image) {
-    return this.usersService.avatarUpload(dto, image);
-  }
 }

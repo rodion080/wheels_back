@@ -45,6 +45,7 @@ export class JourneysDto {
   readonly endPoint: ICoords;
 
   @IsInt({ message: 'Should be a number' })
+  @IsOptional()
   readonly leadId?: number;
 
 }

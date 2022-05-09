@@ -8,6 +8,7 @@ import { FilesService } from "../files/files.service";
 import { Sequelize } from "sequelize-typescript";
 import { FileHub } from "../files/files-hub.model";
 import { JoinJourneyDto } from "./dto/join-journey.dto";
+import { File } from "../files/files.model";
 //TODO token to update avatar
 //TODO wrap in transaction user update
 //TODO why do we need the second argument while create a db model
@@ -39,7 +40,7 @@ export class JourneysService {
     try {
       await this.sequelize.transaction(async (t) => {
         const transactionHost = { transaction: t };
-        const journey = await this.journeyRepository.create(journeysDto);
+        const journey = await this.journeyRepository.create({...journeysDto, leadId:journeysDto.userId});
         const { id: hubId } = await this.createJourneyHub(journeysDto.journeyId);
         journey.fileHubId = hubId;
         await journey.save();
@@ -54,6 +55,15 @@ export class JourneysService {
   async joinJourney(joinJourneyDto: JoinJourneyDto){
     try {
       const result = await this.sequelize.transaction(async (t) => {
+        const jounreyCandidate = await this.journeyRepository.findOne(
+          {where:{id:joinJourneyDto.journeyId}}
+        );
+        if(!jounreyCandidate){
+          throw new HttpException(
+            'The journey with such id does not exist',
+            HttpStatus.NOT_FOUND,
+          );
+        }
         const transactionHost = { transaction: t };
         const {userId, journeyId} = joinJourneyDto;
         const candidate = await this.userJourneyRepository.findOne(
@@ -73,8 +83,40 @@ export class JourneysService {
     }
   }
 
-  async getJourneysByUserId(userId:number){
+  async getJourneysByUserId(userId:number,pageNum:number, numPerPage:number){
+    const since = ( pageNum - 1 )  * numPerPage;
+    // const to = since + numPerPage;
+    return await this.sequelize.transaction(async (t) => {
+      const transactionHost = { transaction: t };
+      const journeys =  await this.journeyRepository.findAll({
+        // rejectOnEmpty: undefined,
+        attributes: ['id', 'heading', 'description','date', 'beginPoint', 'endPoint'  ],
+        order:[['id', 'ASC']],
+        limit:numPerPage,
+        offset: since,
+        include:[{
+          model:UserJourney,
+          where: { userId },
+        }]
+      });
 
+      const overallNumber = ( await this.journeyRepository.findAll({
+        // rejectOnEmpty: undefined,
+        attributes: ['id', 'heading', 'description','date', 'beginPoint', 'endPoint'  ],
+        order:[['id', 'ASC']],
+        include:[{
+          model:UserJourney,
+          where: { userId },
+        }]
+      })).length;
+
+      return {
+        journeys,
+        overallNumber
+      };
+    });
+  } catch (e) {
+    throw e;
   }
 
 

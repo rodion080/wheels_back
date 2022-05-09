@@ -1,4 +1,4 @@
-import { Model, Table, Column, DataType, BelongsToMany, ForeignKey, BelongsTo, HasOne } from "sequelize-typescript";
+import { Model, Table, Column, DataType, BelongsToMany, ForeignKey, BelongsTo, HasOne, HasMany } from "sequelize-typescript";
 import { UserJourney } from "./user-journey.model";
 import { User } from "../users/users.model";
 import { FileHub } from "../files/files-hub.model";
@@ -59,4 +59,8 @@ export class Journey extends Model<Journey> {
 
   @BelongsToMany(()=>User, () =>UserJourney )
   participants:User[];
+
+  @HasMany(()=>UserJourney)
+  userJourney:UserJourney;
+
 }

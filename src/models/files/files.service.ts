@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { FileType } from './file-types.model';
 import { AddFiletypeDto } from './dto/add-filetype.dto';
-import { FileHub } from './files-hub.model';
 import { ImageFileUtil } from './utils/image-file.util';
 import { IFile } from './utils/file.util';
 import { FileDto } from './dto/file.dto';
@@ -31,10 +30,6 @@ export class FilesService {
     console.log('absPathWithFile', absPathWithFile);
     const file2 = fs.createReadStream(absPathWithFile);
     return file2;
-    // console.log(file2);
-    // console.log(absPathWithFile);
-    // console.log();
-    // return file2.pipe(res)
   }
 
 

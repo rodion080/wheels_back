@@ -1,26 +1,23 @@
 import {
   Injectable,
-  // OnModuleInit,
   HttpException,
   HttpStatus,
   UnauthorizedException,
-  Body,
-  UploadedFile,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { InjectModel } from '@nestjs/sequelize';
 import { User } from './users.model';
 import * as bcrypt from 'bcrypt';
-import sequelize, { Op, QueryTypes } from 'sequelize';
+import  { Op } from 'sequelize';
 import { JwtService } from '@nestjs/jwt';
-import { AvatarImageDto } from './dto/avatar-image.dto';
 import { FilesService } from '../files/files.service';
 import { Sequelize } from 'sequelize-typescript';
 import { File } from '../files/files.model';
 import { IFile } from '../files/utils/file.util';
 import { mimeTypesAndExts } from '../files/utils/image-file.util';
 import { FileHub } from '../files/files-hub.model';
+import { AvatarImageDto2 } from "./dto/avatar-image.dto2";
 
 @Injectable()
 export class UsersService {
@@ -56,34 +53,6 @@ export class UsersService {
     });
   }
 
-  async update(dto: CreateUserDto) {
-    console.log(dto);// { login: string; email: string }
-    const testUser = await this.getUser({ login: dto.login, email: dto.email });
-    if (testUser) {
-      const loginSame = dto.login === testUser.login;
-      const emailSame = dto.email === testUser.email;
-      const descrSame = dto.description === testUser.description;
-      const idSame = dto.userId === testUser.id;
-      console.log(loginSame);
-      console.log(emailSame);
-      console.log(descrSame);
-      if(loginSame && emailSame && descrSame && idSame ){
-        return {status:200};
-      }
-
-      if(!idSame && (loginSame || emailSame ) ){
-        throw new HttpException(
-          'User with such email of login already exists',
-          HttpStatus.CONFLICT,
-        );
-      }
-    }
-    const user = await this.getUserById(dto.userId);
-    user.login= dto.login;
-    user.email= dto.email;
-    user.description= dto.description;
-    return await user.save();
-  }
 
   async create(dto: CreateUserDto) {
     if (await this.getUser(dto)) {
@@ -101,7 +70,11 @@ export class UsersService {
     user.description = dto.description;
     user.role = 'USER';
     user.password = hashPassword;
-    return this.generateToken(await user.save());
+    const userResult = await user.save();
+    const { id: hubId } = await this.createUserHub(userResult.id);
+    user.fileHubId = hubId;
+    user.save();
+    return this.generateToken(userResult);
   }
 
   async login(dto: LoginUserDto) {
@@ -158,62 +131,52 @@ export class UsersService {
     }
   }
 
-  async avatarUpdate(dto: AvatarImageDto, image) {
+  async update2(dto: AvatarImageDto2, image?: IFile) {
     try {
-      this.mimeTypeControl(image);
-      const user = (
-        await this.userRepository.findAll({
-          where: [{ id: dto.userId }],
-          include: { all: true, nested: true },
-        })
-      )[0];
-      const existingFileUuid = user.fileHub.files[0].uuid;
-      const dbObject = await this.fileService.createFile(image);
-      const file = await this.fileRepository.findByPk(existingFileUuid);
-      await this.fileService.removeFile({
-        uuid: file.uuid,
-        ext: file.ext,
-        path: file.path,
-      });
-      await File.update(
-        { uuid: dbObject.uuid, name: dbObject.name, path: dbObject.path },
-        { where: { uuid: file.uuid } },
-      );
-    } catch (e) {
-      console.log(e);
-      throw e;
-    }
-  }
-
-  async avatarUpload(dto: AvatarImageDto, image: IFile) {
-    try {
-      this.mimeTypeControl(image);
-      const users = await this.userRepository.findAll({
-        where: [{ id: dto.userId }],
-        include: { all: true, nested: true },
-      });
-
-      if(users[0].fileHub){
-        if (users[0].fileHub.files.length) {
-          throw new HttpException(
-            'This user already has an avatar',
-            HttpStatus.CONFLICT,
-          );
-        }
-      }
-
       await this.sequelize.transaction(async (t) => {
-        const transactionHost = { transaction: t };
-        const { id: hubId } = await this.createUserHub(dto.userId);
-        // const { id: hubId } = await this.fileService.createUserHub(dto.userId);
-        const user = await this.userRepository.findByPk(dto.userId);
-        user.fileHubId = hubId;
-        user.save();
-        const dbObject = await this.fileService.createFile(image);
-        await this.fileRepository.create({ ...dbObject, fileHubId:hubId });
+        const testUser = await this.getUser({ login: dto.login, email: dto.email });
+        if (testUser) {
+          const loginSame = dto.login === testUser.login;
+          const emailSame = dto.email === testUser.email;
+          const idSame = Number(dto.userId) === testUser.id;
+
+          if(!idSame && (loginSame || emailSame ) ){
+            throw new HttpException(
+              'User with such email or login already exists',
+              HttpStatus.CONFLICT,
+            );
+          }
+        }
+        const user = await this.getUserById(dto.userId);
+        user.login= dto.login;
+        user.email= dto.email;
+        user.description= dto.description;
+        await user.save();
+
+        if(typeof image !== 'undefined' && user.fileHub.files.length) {
+          this.mimeTypeControl(image);
+          const existingFileUuid = user.fileHub.files[0].uuid;
+          const dbObject = await this.fileService.createFile(image);
+          const file = await this.fileRepository.findByPk(existingFileUuid);
+          const {uuid, ext, path} = file;
+          await this.fileService.removeFile({uuid,ext,path});
+          await File.update(
+            { uuid: dbObject.uuid, name: dbObject.name, path: dbObject.path },
+            { where: { uuid: file.uuid } },
+          );
+        }else if(typeof image !== 'undefined' && !user.fileHub.files.length){
+          const dbObject = await this.fileService.createFile(image);
+          await this.fileRepository.create({ ...dbObject, fileHubId:user.fileHub.id });
+        }else if(!dto.notRemoveAvatar) {
+          if(user.fileHub.files.length){
+            const fileCandidate = this.fileRepository.findByPk(user.fileHub.files[0].uuid);
+            if(fileCandidate){
+              await this.fileService.removeFileWithDb(user.fileHub.files[0].uuid);
+            }
+          }
+        }
       });
-    } catch (e) {
-      console.log(e);
+    }catch (e) {
       throw e;
     }
   }

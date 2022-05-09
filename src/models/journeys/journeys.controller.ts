@@ -38,7 +38,7 @@ export class JourneysController {
     return this.journeysService.update(journeysDto);
   }
 
-  @Post('/joinJourney')
+  @Post('/join')
   // @UseGuards(AccountGuard)
   @UsePipes(ValidationPipe)
   async joinJourney(@Body() joinJourneyDto: JoinJourneyDto) {
@@ -50,8 +50,8 @@ export class JourneysController {
   // @UseGuards(AccountGuard)
   @UsePipes(ValidationPipe)
   async getJourneysByUserId(@Query() queryParams) {
-    console.log(queryParams);
-    // return this.journeysService.getJourneysByUserId(params.userId);
+    const {userId, pageNum, numPerPage} = queryParams;
+    return this.journeysService.getJourneysByUserId(Number(userId), Number(pageNum), Number(numPerPage));
   }
 
 
