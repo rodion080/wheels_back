@@ -148,8 +148,8 @@ export class UsersService {
           }
         }
         const user = await this.getUserById(dto.userId);
-        user.login= dto.login;
-        user.email= dto.email;
+        user.login = dto.login;
+        user.email = dto.email;
         user.description= dto.description;
         await user.save();
 

@@ -48,7 +48,7 @@ export class User extends Model<User, UserCreationAttribute> {
   })
   role: string;
 
-  @Column({ type: DataType.TEXT,  allowNull: true })
+  @Column({ type: DataType.TEXT,  unique: false, allowNull: true })
   description: string;
 
   @ForeignKey(() => FileHub)

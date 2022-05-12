@@ -16,7 +16,7 @@ module.exports = {
       },
       path: {
         type: Sequelize.STRING,
-        unique: true,
+        unique: false,
         allowNull: false,
       },
       mime: {

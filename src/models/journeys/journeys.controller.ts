@@ -47,14 +47,12 @@ export class JourneysController {
 
 
   @Get('/getJourneysByUserId')
-  // @UseGuards(AccountGuard)
+  @UseGuards(AccountGuard)
   @UsePipes(ValidationPipe)
   async getJourneysByUserId(@Query() queryParams) {
     const {userId, pageNum, numPerPage} = queryParams;
     return this.journeysService.getJourneysByUserId(Number(userId), Number(pageNum), Number(numPerPage));
   }
-
-
 
 
 }

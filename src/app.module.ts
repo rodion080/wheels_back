@@ -10,6 +10,12 @@ import { FileHub } from './models/files/files-hub.model';
 import { File } from './models/files/files.model';
 import { Journey } from "./models/journeys/journeys.model";
 import { UserJourney } from "./models/journeys/user-journey.model";
+import { ChatGateway } from "./chats/chat.gateway";
+import { MessagesController } from './models/messages/messages.controller';
+import { MessagesModule } from './models/messages/messages.module';
+import { WsController } from './models/ws/ws.controller';
+import { WsService } from './models/ws/ws.service';
+import { WsModule } from './models/ws/ws.module';
 
 // const sequelizeConfig = {
 //   dialect: 'postgres',
@@ -24,8 +30,8 @@ import { UserJourney } from "./models/journeys/user-journey.model";
 // };
 
 @Module({
-  controllers: [],
-  providers: [],
+  controllers: [MessagesController, WsController],
+  providers: [ChatGateway, WsService],
   imports: [
     ConfigModule.forRoot({
       envFilePath: `.${process.env.NODE_ENV}.env`,
@@ -44,6 +50,8 @@ import { UserJourney } from "./models/journeys/user-journey.model";
     UsersModule,
     JourneysModule,
     FilesModule,
+    MessagesModule,
+    WsModule,
   ],
 })
 export class AppModule {}

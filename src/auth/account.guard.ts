@@ -40,7 +40,7 @@ export class AccountGuard implements CanActivate {
             const req = context.switchToHttp().getRequest();
             const user = getUserByRequest(req, this.jwtService);
             req.user = user;
-            return user.id === Number(req.params.userId) || user.id === req.body.userId;
+            return user.id === Number(req.params.userId) || user.id === req.body.userId || Number(req.query.userId) === user.id;
         } catch (e) {
             throw new HttpException("User is not authorized", HttpStatus.FORBIDDEN);
         }

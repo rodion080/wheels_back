@@ -26,7 +26,7 @@ export class File extends Model<File> {
   @Column({ type: DataType.STRING, unique: false, allowNull: false })
   name: string;
 
-  @Column({ type: DataType.STRING, unique: true, allowNull: false })
+  @Column({ type: DataType.STRING, allowNull: false })
   path: string;
 
   @Column({ type: DataType.STRING,  allowNull: false })
