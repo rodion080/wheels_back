@@ -1,3 +1,4 @@
 export class FileDto {
-  readonly uuid: string;
+    readonly uuid: string;
 }
+

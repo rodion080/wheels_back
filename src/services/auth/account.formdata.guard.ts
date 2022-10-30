@@ -6,21 +6,22 @@ import {
     Injectable,
     UnauthorizedException
 } from "@nestjs/common";
-import {JwtService} from "@nestjs/jwt";
+import { JwtService } from "@nestjs/jwt";
 // import {Observable} from 'rxjs';
-import {Reflector} from "@nestjs/core";
+import { Reflector } from "@nestjs/core";
 import * as multer from 'multer';
 // import { IncomingMessage } from "http";
 import { objectClone } from "../../utils";
 import * as _ from 'lodash';
 
 async function getId(r){
-    const {body} = await new Promise((resolve, reject) => {
-                    multer().any()(r, {}, function(err) {
-                        if (err) reject(err);
-                        resolve(r);
-                    });
-                });
+    const { body } = await new Promise((resolve, reject) => {
+        multer().any()(r, {}, function(err) {
+            if (err) reject(err);
+            resolve(r);
+        });
+    });
+
     return Number(body.userId);
 }
 
@@ -31,12 +32,14 @@ export class AccountFormdataGuard implements CanActivate {
     }
 
     async canActivate(context: ExecutionContext)
-      // :
-      // boolean | Promise<boolean> | Observable<boolean>
+    // :
+    // boolean | Promise<boolean> | Observable<boolean>
     {
         try {
             const req = context.getClass();
+
             return true;
+
             // const reqClone = _.clone(req);
             // const authHeader = req.headers.authorization;
             // const bearer = authHeader.split(' ')[0];

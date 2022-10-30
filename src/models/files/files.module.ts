@@ -6,10 +6,9 @@ import { User } from "../users/users.model";
 import { File } from "./files.model";
 
 @Module({
-  controllers: [ FilesController],
-  providers: [FilesService],
-  imports:[SequelizeModule.forFeature([ File]),],
-  exports: [FilesService]
+    controllers: [ FilesController ],
+    providers: [ FilesService ],
+    imports:[ SequelizeModule.forFeature([ File ]), ],
+    exports: [ FilesService ]
 })
-//forwardRef(() => FilesModule),
 export class FilesModule {}

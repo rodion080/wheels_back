@@ -11,7 +11,6 @@ const descriptionMax = 250;
 
 export class CreateUserDto {
 
-
   @IsInt({ message: 'Should be a number' })
     readonly userId?: number;
 

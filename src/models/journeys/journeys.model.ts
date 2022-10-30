@@ -3,11 +3,10 @@ import { UserJourney } from "./user-journey.model";
 import { User } from "../users/users.model";
 import { FileHub } from "../files/files-hub.model";
 
-
-
 export interface ICoords{
-  readonly lat:number
-  readonly lon:number
+  readonly lat:number;
+  readonly lon:number;
+
 }
 
 interface UserCreationAttribute {
@@ -21,46 +20,46 @@ interface UserCreationAttribute {
 @Table({ tableName: 'journeys' })
 export class Journey extends Model<Journey> {
   @Column({
-    type: DataType.INTEGER,
-    unique: true,
-    autoIncrement: true,
-    primaryKey: true,
+      type: DataType.INTEGER,
+      unique: true,
+      autoIncrement: true,
+      primaryKey: true,
   })
-  id: number;
+      id: number;
 
   @Column({ type: DataType.STRING, unique: false, allowNull: false })
-  heading: string;
+      heading: string;
 
   @Column({ type: DataType.STRING, unique: false, allowNull: true })
-  description: string;
+      description: string;
 
   @Column({ type: DataType.DATE, unique: false, allowNull: true })
-  date: Date;
+      date: Date;
 
   @Column({ type: DataType.JSONB, unique: false, allowNull: false })
-  beginPoint:ICoords;
+      beginPoint:ICoords;
 
   @Column({ type: DataType.JSONB, unique: false, allowNull: false })
-  endPoint:ICoords;
+      endPoint:ICoords;
 
   @ForeignKey(() => FileHub)
   @Column({ type: DataType.INTEGER, allowNull: true, defaultValue: null })
-  fileHubId: number;
+      fileHubId: number;
 
   @BelongsTo(() => FileHub)
-  fileHub: FileHub;
+      fileHub: FileHub;
 
   @ForeignKey(() => User)
   @Column({ type: DataType.INTEGER, allowNull: false })
-  leadId: number;
+      leadId: number;
 
   @BelongsTo(()=>User)
-  lead:User;
+      lead:User;
 
   @BelongsToMany(()=>User, () =>UserJourney )
-  participants:User[];
+      participants:User[];
 
   @HasMany(()=>UserJourney)
-  userJourney:UserJourney;
+      userJourney:UserJourney;
 
 }

@@ -1,45 +1,40 @@
 import {
-  Model,
-  Table,
-  Column,
-  DataType,
-  ForeignKey,
-  BelongsTo,
+    Model,
+    Table,
+    Column,
+    DataType,
+    ForeignKey,
+    BelongsTo,
 } from 'sequelize-typescript';
 import { FileHub } from './files-hub.model';
-
-// interface UserCreationAttribute {
-//   email: string;
-//   password: string;
-// }
 
 @Table({ tableName: 'files', timestamps: false })
 export class File extends Model<File> {
   @Column({
-    type: DataType.STRING,
-    unique: true,
-    primaryKey: true,
-    allowNull: false,
+      type: DataType.STRING,
+      unique: true,
+      primaryKey: true,
+      allowNull: false,
   })
-  uuid: string;
+      uuid: string;
 
   @Column({ type: DataType.STRING, unique: false, allowNull: false })
-  name: string;
+      name: string;
 
   @Column({ type: DataType.STRING, allowNull: false })
-  path: string;
+      path: string;
 
   @Column({ type: DataType.STRING,  allowNull: false })
-  mime: string;
+      mime: string;
 
   @Column({ type: DataType.STRING,  allowNull: false })
-  ext: string;
+      ext: string;
 
   @ForeignKey(() => FileHub)
   @Column({ type: DataType.INTEGER, allowNull: false })
-  fileHubId: number;
+      fileHubId: number;
 
   @BelongsTo(() => FileHub)
-  fileHub: FileHub;
+      fileHub: FileHub;
 
 }

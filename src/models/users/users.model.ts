@@ -25,7 +25,6 @@ export enum UserRoleTypes {
   USER = "USER",
 }
 
-
 @Table({ tableName: "users" })
 export class User extends Model<User, UserCreationAttribute> {
   @Column({
@@ -35,7 +34,6 @@ export class User extends Model<User, UserCreationAttribute> {
       primaryKey: true
   })
       id: number;
-
 
   @Column({ type: DataType.STRING, unique: true, allowNull: false })
       login: string;
@@ -68,7 +66,5 @@ export class User extends Model<User, UserCreationAttribute> {
 
   @BelongsToMany(()=>Journey, () =>UserJourney )
       journeys: Journey[];
-
-
 
 }

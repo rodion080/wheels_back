@@ -10,17 +10,17 @@ import { File } from "../files/files.model";
 import { JwtModule } from "@nestjs/jwt";
 
 @Module({
-  providers: [JourneysService, FilesService],
-  controllers: [JourneysController],
-  imports:[
-    SequelizeModule.forFeature([User, UserJourney, Journey, File]),
-    JwtModule.register({
-      secret: process.env.PRIVATE_KEY || 'SECRET',
-      signOptions: {
-        expiresIn: '24h',
-      },
-    }),
-  ],
-  exports: [JourneysService],
+    providers: [ JourneysService, FilesService ],
+    controllers: [ JourneysController ],
+    imports:[
+        SequelizeModule.forFeature([ User, UserJourney, Journey, File ]),
+        JwtModule.register({
+            secret: process.env.PRIVATE_KEY || 'SECRET',
+            signOptions: {
+                expiresIn: '24h',
+            },
+        }),
+    ],
+    exports: [ JourneysService ],
 })
 export class JourneysModule {}
