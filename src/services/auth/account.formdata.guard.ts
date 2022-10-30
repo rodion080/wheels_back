@@ -11,7 +11,7 @@ import {JwtService} from "@nestjs/jwt";
 import {Reflector} from "@nestjs/core";
 import * as multer from 'multer';
 // import { IncomingMessage } from "http";
-import { objectClone } from "../utils";
+import { objectClone } from "../../utils";
 import * as _ from 'lodash';
 
 async function getId(r){

@@ -1,10 +1,9 @@
 import { Body, Controller, Get, Param, Patch, Post, Query, UseGuards, UsePipes } from "@nestjs/common";
 import { ApiTags } from "@nestjs/swagger";
 import { JourneysService } from "./journeys.service";
-import { AccountGuard } from "../../auth/account.guard";
-import { LoginUserDto } from "../users/dto/login-user.dto";
+import { AccountGuard } from "../../services/auth/account.guard";
 import { JourneysDto } from "./dto/journeys.dto";
-import { ValidationPipe } from "../../pipes/validation.pipe";
+import { ValidationPipe } from "../../services/pipes/validation.pipe";
 import { JoinJourneyDto } from "./dto/join-journey.dto";
 
 @ApiTags('Journeys')

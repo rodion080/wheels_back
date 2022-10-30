@@ -8,11 +8,13 @@ import { FilesModule } from '../files/files.module';
 import { File } from '../files/files.model';
 import { FilesService } from "../files/files.service";
 import { PassportModule } from "@nestjs/passport";
+import {AuthModule} from "../auth/auth.module";
 
 @Module({
   controllers: [UsersController],
   providers: [UsersService],
   imports: [
+    AuthModule,
     PassportModule,
     SequelizeModule.forFeature([User, File]),
     JwtModule.register({

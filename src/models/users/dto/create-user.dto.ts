@@ -11,13 +11,14 @@ const descriptionMax = 250;
 
 export class CreateUserDto {
 
+
   @IsInt({ message: 'Should be a number' })
-  readonly userId?: number;
+    readonly userId?: number;
 
   @IsString({ message: 'Should be a string' })
   @IsEmail({}, { message: 'Wrong email' })
   @Length(loginMin, loginMax, {
-    message: `Login should not be less than ${loginMin} and not more than ${loginMax}`,
+      message: `Login should not be less than ${loginMin} and not more than ${loginMax}`,
   })
   readonly login: string;
 
@@ -27,13 +28,13 @@ export class CreateUserDto {
 
   @IsString({ message: 'Should be a string' })
   @Length(passMin, passMax, {
-    message: `Password should not be less than ${passMin} and not more than ${passMax}`,
+      message: `Password should not be less than ${passMin} and not more than ${passMax}`,
   })
   readonly password?: string;
 
   @IsString({ message: 'Should be a string' })
   @Length(passMin, passMax, {
-    message: `Description should not be less than ${descriptionMin} and not more than ${descriptionMax}`,
+      message: `Description should not be less than ${descriptionMin} and not more than ${descriptionMax}`,
   })
   readonly description: string;
 

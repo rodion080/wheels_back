@@ -1,20 +1,23 @@
 import {
-  Model,
-  Table,
-  Column,
-  DataType,
-  HasMany,
-  ForeignKey,
-  BelongsTo,
-  BelongsToMany
+    Model,
+    Table,
+    Column,
+    DataType,
+    HasMany,
+    ForeignKey,
+    BelongsTo,
+    BelongsToMany
 } from "sequelize-typescript";
 import { FileHub } from "../files/files-hub.model";
 import { UserJourney } from "../journeys/user-journey.model";
 import { Journey } from "../journeys/journeys.model";
 
+type TypeUserRole = UserRoleTypes.USER | UserRoleTypes.ADMIN
+
 interface UserCreationAttribute {
   email: string;
   password: string;
+  role: TypeUserRole;
 }
 
 export enum UserRoleTypes {
@@ -22,47 +25,49 @@ export enum UserRoleTypes {
   USER = "USER",
 }
 
+
 @Table({ tableName: "users" })
 export class User extends Model<User, UserCreationAttribute> {
   @Column({
-    type: DataType.INTEGER,
-    unique: true,
-    autoIncrement: true,
-    primaryKey: true
+      type: DataType.INTEGER,
+      unique: true,
+      autoIncrement: true,
+      primaryKey: true
   })
-  id: number;
+      id: number;
+
 
   @Column({ type: DataType.STRING, unique: true, allowNull: false })
-  login: string;
+      login: string;
 
   @Column({ type: DataType.STRING, unique: true, allowNull: false })
-  email: string;
+      email: string;
 
   @Column({ type: DataType.STRING, allowNull: false })
-  password: string;
+      password: string;
 
   @Column({
-    type: DataType.ENUM(UserRoleTypes.ADMIN, UserRoleTypes.USER),
-    allowNull: false,
-    defaultValue: UserRoleTypes.USER
+      type: DataType.ENUM(UserRoleTypes.ADMIN, UserRoleTypes.USER),
+      allowNull: false,
+      defaultValue: UserRoleTypes.USER
   })
-  role: string;
+      role: TypeUserRole;
 
   @Column({ type: DataType.TEXT,  unique: false, allowNull: true })
-  description: string;
+      description: string;
 
   @ForeignKey(() => FileHub)
   @Column({ type: DataType.INTEGER, allowNull: true, defaultValue: null })
-  fileHubId: number;
+      fileHubId: number;
 
   @BelongsTo(() => FileHub)
-  fileHub: FileHub;
+      fileHub: FileHub;
 
   @HasMany(()=>Journey )
-  userJourneys: Journey[];
+      userJourneys: Journey[];
 
   @BelongsToMany(()=>Journey, () =>UserJourney )
-  journeys: Journey[];
+      journeys: Journey[];
 
 
 
